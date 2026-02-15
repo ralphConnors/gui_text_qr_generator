@@ -1,76 +1,84 @@
-#current version: 1.5
-#made in Python 3.13
-
-# Script uses these following imports.
-import commands, mainProcess
 from tkinter import *
+import commands, mainProcess
 
-# -- To load before the whole thing runs.
+class App(Tk):
+    def __init__(self):
+        super().__init__()
 
-commands.jsonTurned_variable() # Loaded before the main setup, to plug error_messaegs.json into the error_message variable 
+        self.title("Text QR Code Generator - 1.5 - KDTal1")
+        self.resizable(False, False)
 
-#  ---  GUI SETUP  ---
-main = Tk()
-main.title("Text QR Code Generator - 1.5 - KDTal1")
-main.resizable(False, False)
+        self.frame1 = main_frame1(self)
+        self.frame1.grid(row=0, column=0, padx=20, pady=20)
+        self.frame2 = main_frame2(self, self.frame1)
+        self.frame2.grid(row=0, column=1, padx=20, pady=20)
 
-frame1 = Frame(main)
-frame2 = Frame(main)
-subframe1 = Frame(frame1) # To add in a separate features area.
+class main_frame1(Frame):
+    def __init__(self, master):
+        super().__init__(master)
 
-frame1.grid(row=0, column=0, padx=20, pady=20)
-frame2.grid(row=0, column=1, padx=20, pady=20)
+        self.label_title = Label(self, text="Text QR Code Generator", font=('Arial', 20))
+        self.label_desc = Label(self, text="Enter anything in the textbox", font=("Arial", 11, "italic"))
+        self.entry = Entry(self, width=30, font=('Arial', 17))
+        self.label_features = Label(self, text="- - - - - - - - - - - - MODES - - - - - - - - - - - -", font=('Helvetica', 15))
+        self.label_desc2 = Label(self, text="Then, press the button to generate QR Code", font=("Arial", 11, "italic"))
+        
+        self.target = frame_subFrame1(self)
+        
+        self.buttonGenerate = Button(self, text="GENERATE", command=lambda: [mainProcess.generate_qr(commands.qrCode_folder, commands.error_messages, self.target.choice_Feature, self.entry), mainProcess.view_qr(commands.error_messages)], font=('Arial', 15))
 
-#frame1 contents
-label_title = Label(frame1, text="Text QR Code Generator", font=('Arial', 20))
-label_desc = Label(frame1, text="Enter anything in the textbox", font=("Arial", 11, "italic"))
-entry = Entry(frame1, width=30, font=('Arial', 17))
-label_features = Label(frame1, text="- - - - - - - - - - - - MODES - - - - - - - - - - - -", font=('Helvetica', 15))
-label_desc2 = Label(frame1, text="Then, press the button to generate QR Code", font=("Arial", 11, "italic"))
-buttonGenerate = Button(frame1, text="GENERATE", command=lambda: [mainProcess.generate_qr(commands.qrCode_folder, commands.error_messages, choice_Feature, entry), mainProcess.view_qr(commands.error_messages)], font=('Arial', 15))
+        for variables in [self.label_title, self.label_desc, self.entry, self.label_desc2, self.buttonGenerate, self.label_features, self.target]:
+            variables.pack(pady=7, fill='x', expand=True)
 
-#subframe1 contents
-choice_Feature = StringVar(value="0")
-for featTxt, val, rowNum, colNum in [ # In loop to optimize, and it looks good in readability.
-    ("Normal", "0", "0", "0"),
-    ("Binary", "1", "0", "1"),
-    ("Consochain", "2", "0", "2"),
-    ("Reverse", "3", "0", "3"),
-    ("Effigy", "4", "0", "4")
-]:
-    Radiobutton(
-        subframe1, 
-        variable=choice_Feature, 
-        text=featTxt, 
-        value=val
-    ).grid(
-        row=rowNum,
-        column=colNum,
-        padx=2,
-        pady=2
-    )
+class main_frame2(Frame):
+    def __init__(self, master, target):
+        super().__init__(master)
 
-#pack for frame1
-for variables in [label_title, label_desc, entry, label_desc2, buttonGenerate, label_features, subframe1]:
-    variables.pack(pady=7, fill='x', expand=True)
+        self.target = target
 
-#frame2 contents
-label_file = Label(frame2, text="Or, you can browse a file you can turn into a QR Code.", wraplength=250, justify="center", font=('Helvetica', 10))
-label_file.pack(pady=10)
+        self.label_file = Label(self, text="Or, you can browse a file you can turn into a QR Code.", wraplength=250, justify="center", font=('Helvetica', 10))
+        self.label_file.pack(pady=10)
 
-for textIn, btnCommand, colorBtn in [ # In loop to optimize, and it looks good in readability.
-    ("BROWSE FILE", lambda: commands.browse_file(entry), "#67B174"),
-    ("CLEAR", lambda: commands.clear_entry(entry), "powder blue"),
-    ("OPEN STORAGE", lambda: commands.open_folder(), "powder blue"),
-    ("ABOUT", lambda: commands.about(), "powder blue")
-]:
-    Button(
-        frame2, 
-        text=textIn, 
-        command=btnCommand, 
-        width=25,
-        font=('Helvetica', 15),
-        bg=colorBtn
-    ).pack(pady=10, fill='x', expand=True)
-    
-main.mainloop()
+        for textIn, btnCommand, colorBtn in [ # In loop to optimize, and it looks good in readability.
+            ("BROWSE FILE", lambda: commands.browse_file(self.target.entry), "#67B174"),
+            ("CLEAR", lambda: commands.clear_entry(self.target.entry), "powder blue"),
+            ("OPEN STORAGE", lambda: commands.open_folder(), "powder blue"),
+            ("ABOUT", lambda: commands.about(), "powder blue")
+        ]:
+            Button(
+                self, 
+                text=textIn, 
+                command=btnCommand, 
+                width=25,
+                font=('Helvetica', 15),
+                bg=colorBtn
+            ).pack(pady=10, fill='x', expand=True)
+
+class frame_subFrame1(Frame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.choice_Feature = StringVar(value="0")
+        
+        for featTxt, val, rowNum, colNum in [ # In loop to optimize, and it looks good in readability.
+            ("Normal", "0", "0", "0"),
+            ("Binary", "1", "0", "1"),
+            ("Consochain", "2", "0", "2"),
+            ("Reverse", "3", "0", "3"),
+            ("Effigy", "4", "0", "4")
+        ]:
+            Radiobutton(
+                self, 
+                variable=self.choice_Feature, 
+                text=featTxt, 
+                value=val
+            ).grid(
+                row=rowNum,
+                column=colNum,
+                padx=2,
+                pady=2
+            )
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
