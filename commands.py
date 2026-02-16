@@ -1,5 +1,5 @@
 import json, os, webbrowser
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 from tkinter import *
 
 # Commands are the smaller commands, or the other features that can be accessed w/o gui interaction.

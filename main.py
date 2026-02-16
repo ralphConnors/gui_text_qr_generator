@@ -9,7 +9,7 @@ class App(Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Text QR Code Generator - 1.5 - KDTal1")
+        self.title("Text QR Code Generator")
         self.resizable(False, False)
 
         self.frame3 = main_frame3(self)
@@ -65,8 +65,7 @@ class main_frame2(Frame):
     
     def about(self):
         messagebox.showinfo("Text QR Code Generator", 
-                        "Made by KDTal1 in his spare time. "
-                        "(Possibly also through boredom.)")
+                        "Forked from KDTal1's original 'python-gui_text_qr_generator'. ")
 
 class main_frame3(Frame): # Window for QR Code view
     def __init__(self, master):
