@@ -1,4 +1,4 @@
-import json, os
+import json, os, webbrowser
 from tkinter import filedialog, messagebox
 from tkinter import *
 
@@ -34,17 +34,14 @@ def makeFolder():
         print(f"Debug Error: {e}")
 
 def open_folder():
-    makeFolder()
-    if os.name == 'posix': # used for other OS
-        os.system(f'open "{qrCode_folder}"')
-    else:
-        os.startfile(qrCode_folder)
+    try:
+        webbrowser.open(qrCode_folder)
+    except Exception as e:
+        makeFolder()
+        webbrowser.open(qrCode_folder)
 
 def clear_entry(entry):
     entry.delete(0, END)
-
-def about():
-    messagebox.showinfo("Text QR Code Generator", "Made by KDTal1 in his spare time. (Possibly also through boredom.)")
 
 # FUNCTIONS FOR LAST MODE
 def vencrypt(data):

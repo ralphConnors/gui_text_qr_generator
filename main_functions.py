@@ -67,25 +67,3 @@ def generate_qr(folder, error_messages, choice_Feature, entry): # Main process o
         messagebox.showerror("Error", f"Failed to create QR Code: {e}\n\n{error_messages[random.randint(0, 15)]}") # Shows error.
     
     return date, fileName, link # QR Code is finished! We transfer it back to starting variables
-
-def view_qr(error_messages): # Pops up a window for user to see QR Code.
-    global date, fileName, link
-
-    # SETUP FOR VIEW
-    top = Toplevel()
-    top.title("Generated QR Code")
-    top.resizable(False, False)
-
-    labelset = Label(top, text="TEXT QR CODE GENERATED:", font=("Helvetica", 12))
-    labelset.pack(pady=10)
-
-    try: # User wants to see QR Code.
-        qr_image = ImageTk.PhotoImage(file=link) # Checks if QR Code is in folder.
-        label = Label(top, image=qr_image)
-        label.image = qr_image  # For safekeeping purposes.
-        label.pack(pady=15, padx=15)
-    except Exception as e:
-        messagebox.showerror("Error", f"Failed to show QR Code: {e}\n\n{error_messages[random.randint(0, 15)]}")
-        labelset.config(text="ERROR, NO QR CODE FOUND.")
-
-    top.after(10000, lambda: top.destroy())  # QR Code doesn't need to be there for long, so user has 10 seconds to screenshot the QR Code before it dies.

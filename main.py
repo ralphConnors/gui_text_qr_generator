@@ -1,5 +1,9 @@
 from tkinter import *
-import commands, mainProcess
+from tkinter import messagebox
+from PIL import ImageTk
+
+import commands, main_functions
+import random
 
 class App(Tk):
     def __init__(self):
@@ -8,14 +12,18 @@ class App(Tk):
         self.title("Text QR Code Generator - 1.5 - KDTal1")
         self.resizable(False, False)
 
-        self.frame1 = main_frame1(self)
+        self.frame3 = main_frame3(self)
+        self.frame1 = main_frame1(self, self.frame3)
         self.frame1.grid(row=0, column=0, padx=20, pady=20)
         self.frame2 = main_frame2(self, self.frame1)
         self.frame2.grid(row=0, column=1, padx=20, pady=20)
+        self.frame3.grid(row=1, column=0, columnspan=2, padx=20, pady=20)
 
 class main_frame1(Frame):
-    def __init__(self, master):
+    def __init__(self, master, qr_frame):
         super().__init__(master)
+
+        self.qr_frame = qr_frame
 
         self.label_title = Label(self, text="Text QR Code Generator", font=('Arial', 20))
         self.label_desc = Label(self, text="Enter anything in the textbox", font=("Arial", 11, "italic"))
@@ -25,10 +33,11 @@ class main_frame1(Frame):
         
         self.target = frame_subFrame1(self)
         
-        self.buttonGenerate = Button(self, text="GENERATE", command=lambda: [mainProcess.generate_qr(commands.qrCode_folder, commands.error_messages, self.target.choice_Feature, self.entry), mainProcess.view_qr(commands.error_messages)], font=('Arial', 15))
+        self.buttonGenerate = Button(self, text="GENERATE", command=lambda: [main_functions.generate_qr(commands.qrCode_folder, commands.error_messages, self.target.choice_Feature, self.entry), self.qr_frame.view_qr()], font=('Arial', 15))
 
         for variables in [self.label_title, self.label_desc, self.entry, self.label_desc2, self.buttonGenerate, self.label_features, self.target]:
             variables.pack(pady=7, fill='x', expand=True)
+
 
 class main_frame2(Frame):
     def __init__(self, master, target):
@@ -43,7 +52,7 @@ class main_frame2(Frame):
             ("BROWSE FILE", lambda: commands.browse_file(self.target.entry), "#67B174"),
             ("CLEAR", lambda: commands.clear_entry(self.target.entry), "powder blue"),
             ("OPEN STORAGE", lambda: commands.open_folder(), "powder blue"),
-            ("ABOUT", lambda: commands.about(), "powder blue")
+            ("ABOUT", lambda: self.about(), "powder blue")
         ]:
             Button(
                 self, 
@@ -53,6 +62,32 @@ class main_frame2(Frame):
                 font=('Helvetica', 15),
                 bg=colorBtn
             ).pack(pady=10, fill='x', expand=True)
+    
+    def about(self):
+        messagebox.showinfo("Text QR Code Generator", 
+                        "Made by KDTal1 in his spare time. "
+                        "(Possibly also through boredom.)")
+
+class main_frame3(Frame): # Window for QR Code view
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.label = Label(self, text="TEXT QR CODE GENERATED:", font=("Helvetica", 12))
+        self.label.pack(pady=10)
+        self.qr_label = Label(self)
+        self.qr_label.pack(pady=15, padx=15)
+    
+    def view_qr(self):
+        try:
+            qr_image = ImageTk.PhotoImage(file=main_functions.link)
+            self.qr_label.config(image=qr_image)
+            self.qr_label.image = qr_image
+        except Exception as e:
+            # messagebox.showerror("Error", f"Failed to show QR Code: {e}\n\n{error_messages[random.randint(0, 15)]}")
+            # label.config(text="ERROR, NO QR CODE FOUND.")
+            pass
+    
+
 
 class frame_subFrame1(Frame):
     def __init__(self, master):
