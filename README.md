@@ -1,6 +1,6 @@
 # PYTHON GUI Text to QR Generator
-## QR Generator 1.5 - Initial
-### This will be my last version for this project, the next versions will just be bug fixes.
+## QR Generator version 'Novae'
+### Forked from original ['python-gui_text_qr_generator'](https://github.com/KDTal1/python-gui_text_qr_generator) by KDTal1
  
 ## Features:
 - Compiles entry text, and text files
