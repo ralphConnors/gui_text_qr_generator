@@ -17,6 +17,8 @@ class AppFunctions():
         self.choice_Feature = ''
 
         self.data = ""
+        self.file_path = ""
+        self.file_to_Text = ""
 
     def check_qr_folder(self):
         try:
@@ -56,17 +58,31 @@ class AppFunctions():
         return ''.join(result)
 
     def browse_file(self, entry):
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")]) # What if user wants to add in text file instead?
+        filepath = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
 
-        if file_path:
-            with open(file_path, 'r') as file:
-                file_to_Text = file.read() # It turns the text file into string
-            entry.delete(0, END) # Deletes what's inside of entry first.
-            entry.insert(0, file_to_Text)
+        if filepath:
+            self.file_path = filepath
+            with open(self.file_path, 'r', encoding='utf-8') as file:
+                self.file_to_Text = file.read()
+
+            entry.delete(0, END)
+            entry.insert(0, self.file_path)
+            entry.config(state=DISABLED)
+
+            # Check word count instead of character count.
+            if len(self.file_to_Text.split()) >= 500:
+                messagebox.showwarning("Warning", "File content is large (500+ words) and will not be previewed, but the file path can still be used to generate a QR code.")
+                return False # Indicates that the preview window should not open.
+            else:
+                self.data = self.file_to_Text
+                return True # Indicates that the preview window can open.
+        return False # No file was selected.
 
     def clear_entry(self, entry):
+        entry.config(state=NORMAL)
         entry.delete(0, END)
-    
+        self.data = ""
+        
     def feature_select(self):
         match self.choice_Feature.get():
             case "1": # Binary mode
@@ -95,7 +111,7 @@ class AppFunctions():
         self.check_qr_folder()
 
         try: # The QR code is being created.
-            qr = qrcode.QRCode(version=3, box_size=3, border=4)
+            qr = qrcode.QRCode(version=None, box_size=3, border=4)
             qr.add_data(self.data)
             qr.make(fit=True)
 

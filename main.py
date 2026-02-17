@@ -2,12 +2,15 @@ from tkinter import *
 from tkinter import messagebox
 from app_functions import AppFunctions
 from PIL import ImageTk
+from view_file import ViewFile
+
+import random
 
 class App(Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Text QR Code Generator")
+        self.title("QR Code Generator - Novae")
         self.resizable(False, False)
 
         app_ctrl = AppFunctions()
@@ -27,21 +30,23 @@ class main_frame1(Frame):
         self.qr_frame = qr_frame
         self.app_ctrl = app_ctrl
 
-        self.label_title = Label(self, text="Text QR Code Generator", font=('Arial', 20))
-        self.label_desc = Label(self, text="Enter anything in the textbox", font=("Arial", 11, "italic"))
-        self.entry = Entry(self, width=30, font=('Arial', 17))
-        self.label_features = Label(self, text="- - - - - - - - - - - - MODES - - - - - - - - - - - -", font=('Helvetica', 15))
-        self.label_desc2 = Label(self, text="Then, press the button to generate QR Code", font=("Arial", 11, "italic"))
+        self.label_title = Label(self, text="QR Code Generator - Novae", font=('Courier New', 20))
+        self.label_desc = Label(self, text="Enter anything in the textbox", font=("Courier New", 11, "italic"))
+        self.entry = Entry(self, width=30, font=('Courier New', 17))
+        self.label_features = Label(self, text="- - - - - - - - - MODES - - - - - - - - -", font=('Courier New', 15))
+        self.label_desc2 = Label(self, text="Then, press the button to generate QR Code", font=("Courier New", 11, "italic"))
         
         self.target = frame_subFrame1(self)
         
-        self.buttonGenerate = Button(self, text="GENERATE", command=self.generate_and_view, font=('Arial', 15))
+        self.buttonGenerate = Button(self, text="GENERATE", command=self.generate_and_view, font=('Courier New', 15), bg="#5ED0BB")
 
         for variables in [self.label_title, self.label_desc, self.entry, self.label_desc2, self.buttonGenerate, self.label_features, self.target]:
             variables.pack(pady=7, fill='x', expand=True)
 
     def generate_and_view(self):
-        self.app_ctrl.data = self.entry.get()
+        if not self.app_ctrl.data == self.entry.get() or self.app_ctrl.data == "":
+            self.app_ctrl.data = self.entry.get()
+
         self.app_ctrl.choice_Feature = self.target.choice_Feature
         self.app_ctrl.generate_qr()
         self.qr_frame.view_qr()
@@ -54,27 +59,32 @@ class main_frame2(Frame):
         self.target = target
         self.app_ctrl = app_ctrl
 
-        self.label_file = Label(self, text="Or, you can browse a file you can turn into a QR Code.", wraplength=250, justify="center", font=('Helvetica', 10))
+        self.label_file = Label(self, text="Or, you can browse a file you can turn into a QR Code.", wraplength=250, justify="center", font=('Courier New', 10))
         self.label_file.pack(pady=10)
 
         for textIn, btnCommand, colorBtn in [ # In loop to optimize, and it looks good in readability.
-            ("BROWSE FILE", lambda: self.app_ctrl.browse_file(self.target.entry), "#67B174"),
-            ("CLEAR", lambda: self.app_ctrl.clear_entry(self.target.entry), "powder blue"),
-            ("OPEN STORAGE", lambda: self.app_ctrl.open_qr_folder(), "powder blue"),
-            ("ABOUT", lambda: self.about(), "powder blue")
+            ("BROWSE FILE", lambda: self.file_view(), "#6769B1"),
+            ("CLEAR", lambda: self.app_ctrl.clear_entry(self.target.entry), "#81D3C4"),
+            ("OPEN STORAGE", lambda: self.app_ctrl.open_qr_folder(), "#81D3C4"),
+            ("ABOUT", lambda: self.about(), "#81D3C4")
         ]:
             Button(
                 self, 
                 text=textIn, 
                 command=btnCommand, 
                 width=25,
-                font=('Helvetica', 15),
+                font=('Courier New', 15),
                 bg=colorBtn
             ).pack(pady=10, fill='x', expand=True)
     
     def about(self):
-        messagebox.showinfo("Text QR Code Generator", 
+        messagebox.showinfo("QR Code Generator - Novae", 
                         "Forked from KDTal1's original 'python-gui_text_qr_generator'. ")
+    
+    def file_view(self):
+        # browse_file now returns True if the file is suitable for previewing.
+        if self.app_ctrl.browse_file(self.target.entry):
+            ViewFile(self, self.app_ctrl.file_path, self.app_ctrl.file_to_Text)
 
 class main_frame3(Frame): # Window for QR Code view
     def __init__(self, master, app_ctrl):
@@ -82,7 +92,7 @@ class main_frame3(Frame): # Window for QR Code view
 
         self.app_ctrl = app_ctrl
 
-        self.label = Label(self, text="TEXT QR CODE GENERATED:", font=("Helvetica", 12))
+        self.label = Label(self, text="TEXT QR CODE GENERATED:", font=("Courier New", 12))
         self.label.pack(pady=10)
         self.qr_label = Label(self)
         self.qr_label.pack(pady=15, padx=15)
@@ -93,8 +103,8 @@ class main_frame3(Frame): # Window for QR Code view
             self.qr_label.config(image=qr_image)
             self.qr_label.image = qr_image
         except Exception as e:
-            # messagebox.showerror("Error", f"Failed to show QR Code: {e}\n\n{error_messages[random.randint(0, 15)]}")
-            # label.config(text="ERROR, NO QR CODE FOUND.")
+            messagebox.showerror("Error", f"Failed to show QR Code: {e}\n\n{self.app_ctrl.error_messages[random.randint(0, 15)]}")
+            self.qr_label.config(text="ERROR, NO QR CODE FOUND.")
             pass
     
 class frame_subFrame1(Frame):
@@ -103,24 +113,29 @@ class frame_subFrame1(Frame):
 
         self.choice_Feature = StringVar(value="0")
         
-        for featTxt, val, rowNum, colNum in [ # In loop to optimize, and it looks good in readability.
-            ("Normal", "0", "0", "0"),
-            ("Binary", "1", "0", "1"),
-            ("Consochain", "2", "0", "2"),
-            ("Reverse", "3", "0", "3"),
-            ("Effigy", "4", "0", "4")
-        ]:
+        radio_buttons_data = [ # In loop to optimize, and it looks good in readability.
+            ("Normal", "0"),
+            ("Binary", "1"),
+            ("Consochain", "2"),
+            ("Reverse", "3"),
+            ("Effigy", "4")
+        ]
+
+        for i, (featTxt, val) in enumerate(radio_buttons_data):
             Radiobutton(
                 self, 
                 variable=self.choice_Feature, 
                 text=featTxt, 
-                value=val
+                value=val,
+                font=('Courier New', 10)
             ).grid(
-                row=rowNum,
-                column=colNum,
+                row=0,
+                column=i,
                 padx=2,
-                pady=2
+                pady=2,
+                sticky="ew"
             )
+            self.grid_columnconfigure(i, weight=1)
 
 if __name__ == "__main__":
     app = App()
