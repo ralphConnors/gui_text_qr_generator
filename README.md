@@ -12,7 +12,7 @@
     * Effigy - Effigy.
 
 # Usage:
-![demonstration](https://i.ibb.co/SDjSFDqb/demonstration-qr.gif)
+![demonstration](misc/demonstration_qr.gif)
 
 ## Dependencies:
 - Pillow
