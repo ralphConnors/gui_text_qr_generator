@@ -1,6 +1,7 @@
-# Text QR Generator - version 'Novae'
+# PYTHON GUI Text to QR Generator
+## QR Generator version 'Novae'
 ### Forked from original ['python-gui_text_qr_generator'](https://github.com/KDTal1/python-gui_text_qr_generator) by KDTal1
-
+ 
 ## Features:
 - Compilation:
     * Compiles entry text.
@@ -12,8 +13,9 @@
     * Effigy - Effigy.
 
 # Usage:
-![demonstration](misc/demonstration_qr.gif)
+![demonstration](https://i.ibb.co/SDjSFDqb/demonstration-qr.gif)
 
 ## Dependencies:
 - Pillow
 - QRCode
+- Random
